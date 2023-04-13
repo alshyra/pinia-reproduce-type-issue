@@ -7,14 +7,14 @@ import { storeToRefs } from 'pinia';
 // Option store produces the same result
 import { Ref, computed } from 'vue';
 import type { MyClass } from './MyClass';
-import { MyObject, myCompositionStore } from './stores/myCompositionStore';
+import { useStore } from './stores/useStore';
 
 export default {
   name: 'App',
   components: {},
   setup() {
-    const compositionStore = myCompositionStore();
-    const { name, myClass, formType, myFile } = storeToRefs(compositionStore);
+    const compositionStore = useStore();
+    const { name, myClass, myFile } = storeToRefs(compositionStore);
 
     // Ref<string> it's correct
     type TypeName = typeof name;
@@ -26,10 +26,10 @@ export default {
     type TypeMySimpleClass = typeof myClass;
 
     // It start to cause problem in this case for exemple
-    // @ts-expect-error
-    const classes = computed<Array<MyClass>>(() => formType.value.myClasses ?? [] );
+    // @ts-expect-error feel to remove this to see the error
+    const simpler = computed<MyClass>(() => myClass.value);
     // This is my current workaround
-    const alsoClasses = computed<Array<MyClass>>(() => (formType as Ref<MyObject>).value.myClasses ?? [] );
+    const alsoClasses = computed<MyClass>(() => (myClass as Ref<MyClass>).value);
   },
 };
 </script>
